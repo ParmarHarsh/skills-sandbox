@@ -1,0 +1,14 @@
+{
+  "name": "pebble-notes",
+  "version": "0.4.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test",
+    "start": "node src/server.js",
+    "migrate": "node src/migrate.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.0"
+  }
+}
