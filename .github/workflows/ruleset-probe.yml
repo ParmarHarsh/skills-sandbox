@@ -1,0 +1,24 @@
+name: ruleset-probe
+
+# Temporary: checks whether a ruleset that only GitHub Actions may bypass lets this
+# workflow's GITHUB_TOKEN push a protected branch and a protected tag. Removed after the test.
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Push the protected branch and a protected tag with GITHUB_TOKEN
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q --allow-empty -m "probe: pushed by GITHUB_TOKEN"
+          git push origin HEAD:refs/heads/probe-protected && echo "RESULT branch push: OK" || echo "RESULT branch push: REJECTED"
+          t="probe--v0.0.$GITHUB_RUN_NUMBER"; git tag -a "$t" -m probe
+          git push origin "$t" && echo "RESULT tag push: OK" || echo "RESULT tag push: REJECTED"
