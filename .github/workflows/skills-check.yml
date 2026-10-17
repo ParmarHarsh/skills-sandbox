@@ -1,0 +1,22 @@
+name: skills-check
+
+# Fails if a vendored library skill in .claude/skills was edited by hand; reports skills
+# that are behind the library's stable branch. No secrets, no model calls.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  skills:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Vendored skills match .claude/skills.lock
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/ParmarHarsh/parmarharsh-skills/stable/bin/skills-sync -o "$RUNNER_TEMP/skills-sync"
+          bash "$RUNNER_TEMP/skills-sync" check
+      - name: Skills behind stable (informational)
+        run: bash "$RUNNER_TEMP/skills-sync" status || echo "::notice::some skills are behind stable; run skills-sync sync"
